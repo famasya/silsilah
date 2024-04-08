@@ -1,6 +1,6 @@
 import { FamilyNode } from '@/types';
 import { OrgChart } from 'd3-org-chart';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { EditMember } from './edit-member';
 
 type Props = {
@@ -26,7 +26,7 @@ export default function FamilyTree({ familyTree }: Props) {
     state: false,
     node: null
   });
-  const chart = new OrgChart<FamilyNode>();
+  const chart = useMemo(() => new OrgChart<FamilyNode>(), []);
 
   const openEditMemberModal = (state: boolean, node: FamilyNode | null) => {
     setEditMember({
@@ -57,7 +57,7 @@ export default function FamilyTree({ familyTree }: Props) {
         })
         .render();
     }
-  }, [d3Container.current]);
+  }, [chart, familyTree]);
 
   return (
     <div className={'h-full'}>

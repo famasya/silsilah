@@ -1,9 +1,8 @@
 'use client'
 
 import { FamilyNode } from '@/types';
-import * as d3 from 'd3';
 import dynamic from 'next/dynamic';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const FamilyTree = dynamic(() => import('@/components/family-tree'), { ssr: false });
 
@@ -25,16 +24,7 @@ export const familyTree = [{
   parentId: 'id2'
 }];
 export default function Home() {
-  const [data, setData] = useState<FamilyNode[]>([]);
-
-
-  useEffect(() => {
-    d3.csv(
-      'https://raw.githubusercontent.com/bumbeishvili/sample-data/main/org.csv'
-    ).then((data) => {
-      setData(familyTree);
-    });
-  }, [true]);
+  const [data, setData] = useState<FamilyNode[]>(familyTree);
 
   return <div id="wrapper" className="h-screen" >
     <FamilyTree
