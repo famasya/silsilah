@@ -67,7 +67,10 @@ export default function Editor({ editingNode, nodes, setNodes, openEditor, setOp
     setNode({ ...node, [key]: value })
   }
 
-  return <Dialog open={openEditor} onOpenChange={setOpenEditor}>
+  return <Dialog open={openEditor} onOpenChange={() => {
+    setNode(defaultNodeValue);
+    setOpenEditor(false)
+  }}>
     <DialogContent>
       <DialogHeader>
         <DialogTitle className="font-bold">{editingNode ? 'Ubah Data' : 'Tambah Data'}</DialogTitle>
@@ -146,7 +149,6 @@ export default function Editor({ editingNode, nodes, setNodes, openEditor, setOp
           } else {
             setNodes([...nodes, { ...node, id: uuid() }])
           }
-          setNode(defaultNodeValue)
           setOpenEditor(false)
         }}>Simpan</Button>
         {editingNode !== null ? <Button variant={"destructive"}

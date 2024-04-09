@@ -13,13 +13,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FamilyNode } from "@/types";
-import { ExpandIcon, GithubIcon, HardDriveDownloadIcon, MenuIcon, SaveIcon } from "lucide-react";
+import { ExpandIcon, FileIcon, GithubIcon, HardDriveDownloadIcon, MenuIcon, SaveIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from 'sonner';
 import useSWR from "swr";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { useToast } from "./ui/use-toast";
 
 type Props = {
   nodes: FamilyNode[],
@@ -34,7 +34,6 @@ type Props = {
 }
 
 export default function Menu({ nodes, toggleNodesView, exportAction, setFamily, family, lastSync }: Props) {
-  const { toast } = useToast()
   const router = useRouter()
   const [familyName, setFamilyName] = useState('')
   const [saveModal, openSaveModal] = useState(false);
@@ -50,10 +49,7 @@ export default function Menu({ nodes, toggleNodesView, exportAction, setFamily, 
   }).then(async (res) => {
     if (res.status !== 200) {
       const body = await res.json()
-      toast({
-        title: 'Ups... Penyimpanan gagal',
-        description: body.message,
-      })
+      toast.error('Penyimpanan gagal')
     } else {
       const body = await res.json()
       router.push(`/?fid=${body.id}`)
@@ -61,10 +57,7 @@ export default function Menu({ nodes, toggleNodesView, exportAction, setFamily, 
         id: body.id,
         title: familyName
       })
-      toast({
-        title: 'Berhasil!',
-        description: <>Silsilah <strong>{familyName}</strong> telah disimpan</>
-      })
+      toast.success(<>Silsilah <strong>{familyName}</strong> telah disimpan</>)
       openSaveModal(false)
     }
   }), {
@@ -79,6 +72,7 @@ export default function Menu({ nodes, toggleNodesView, exportAction, setFamily, 
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         <DropdownMenuLabel>Menu</DropdownMenuLabel>
+        <DropdownMenuItem onClick={() => location.href = '/'} ><FileIcon size={16} className="mr-2" /> Silsilah baru</DropdownMenuItem>
         <DropdownMenuItem onClick={() => openSaveModal(true)} disabled={family.id !== ''}><SaveIcon size={16} className="mr-2" /> {family.id ? 'Tersimpan otomatis' : 'Simpan silsilah'} </DropdownMenuItem>
         <DropdownMenuItem onClick={toggleNodesView} disabled={nodes.length === 0}><ExpandIcon size={16} className="mr-2" /> Buka / tutup semua</DropdownMenuItem>
         <DropdownMenuItem onClick={exportAction} disabled={nodes.length === 0}><HardDriveDownloadIcon size={16} className="mr-2" /> Simpan gambar (PNG)</DropdownMenuItem>

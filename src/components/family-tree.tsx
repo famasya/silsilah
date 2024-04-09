@@ -1,8 +1,8 @@
 import { FamilyNode } from '@/types';
 import { OrgChart } from 'd3-org-chart';
 import { useEffect, useLayoutEffect, useRef } from 'react';
+import { toast } from "sonner";
 import useSWR from 'swr';
-import { useToast } from './ui/use-toast';
 
 type Props = {
   nodes: FamilyNode[],
@@ -32,7 +32,6 @@ const getChildren = (nodes: FamilyNode[], parentId: string) => {
 
 export default function FamilyTree({ setLastSync, chart, nodesView = 'default', nodes, clickNodeAction, familyId }: Props) {
   const d3Container = useRef(null);
-  const { toast } = useToast();
   const isInitialRender = useRef(true);
   const { mutate } = useSWR('/api/update', () => {
     fetch('/api/update', {
@@ -44,17 +43,14 @@ export default function FamilyTree({ setLastSync, chart, nodesView = 'default', 
         id: familyId,
         payload: nodes
       }),
-    }).then(async (res) => {
+    }).then(async (res: any) => {
       if (res.status !== 200) {
         const body = await res.json()
-        toast({
-          title: 'Ups... Penyimpanan gagal',
-          description: body.message,
+        toast.error(`Penyimpanan gagal`, {
+          description: body.message
         })
       } else {
-        const lastSyncDate = new Date()
-        toast({
-          title: `Tersimpan: ${lastSyncDate.toLocaleTimeString()}`,
+        toast.info('Tersimpan', {
           duration: 1000
         })
       }
