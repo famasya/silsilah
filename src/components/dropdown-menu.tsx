@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FamilyNode } from "@/types";
-import { GithubIcon, HelpCircle, MenuIcon, SaveIcon } from "lucide-react";
+import { GithubIcon, MenuIcon, SaveIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
@@ -78,8 +78,7 @@ export default function Menu({ nodes, setFamily, family, lastSync }: Props) {
       <DropdownMenuContent align='end'>
         <DropdownMenuLabel>Menu</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => openSaveModal(true)} disabled={family.id !== ''}><SaveIcon size={16} className="mr-2" /> Simpan silsilah</DropdownMenuItem>
-        <DropdownMenuItem><HelpCircle size={16} className="mr-2" /> Bantuan</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => openSaveModal(true)} disabled={family.id !== ''}><SaveIcon size={16} className="mr-2" /> {family.id ? 'Tersimpan otomatis' : 'Simpan silsilah'} </DropdownMenuItem>
         <DropdownMenuItem onClick={() => window.open("https://github.com/famasya/silsilah", "_blank")}><GithubIcon size={16} className="mr-2" /> Repository</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-xs flex flex-col items-start gap-2">
@@ -88,6 +87,8 @@ export default function Menu({ nodes, setFamily, family, lastSync }: Props) {
             Sinkronisasi: <strong>{lastSync.toLocaleString()}</strong>
           </span>
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="text-xs">Dibuat pada hari Selasa, 29 Ramadhan 1445 H</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
 

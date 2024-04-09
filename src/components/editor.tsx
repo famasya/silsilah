@@ -57,7 +57,7 @@ export default function Editor({ editingNode, nodes, setNodes, openEditor, setOp
   return <Dialog open={openEditor} onOpenChange={setOpenEditor}>
     <DialogContent>
       <DialogHeader>
-        <DialogTitle className="font-bold">TAMBAH ANGGOTA</DialogTitle>
+        <DialogTitle className="font-bold">{editingNode ? 'Ubah Data' : 'Tambah Data'}</DialogTitle>
       </DialogHeader>
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">
