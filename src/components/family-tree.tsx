@@ -1,47 +1,90 @@
 import { FamilyNode } from '@/types';
 import { OrgChart } from 'd3-org-chart';
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { EditMember } from './edit-member';
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import useSWR from 'swr';
+import { useToast } from './ui/use-toast';
 
 type Props = {
-  familyTree: FamilyNode[]
+  nodes: FamilyNode[],
+  familyId: string | null,
+  setLastSync: (lastSync: Date) => void,
+  clickNodeAction: (node: FamilyNode) => void
 }
 
-const NodeElement = (familyTree: FamilyNode[], node: FamilyNode) => {
+const NodeElement = (nodes: FamilyNode[], node: FamilyNode) => {
   return `<div class="border text-base h-full border-2 p-4 border-gray-200 rounded">
-  <div class="text-lg font-bold">${node.name}</div>
+  <div class="text-lg font-bold">[${node.sex.toString()}] ${node.name}</div>
   ${node.spouse ? `<div>Pasangan : ${node.spouse}</div>` : ''}
-  <div>Anak : ${getChildren(familyTree, node.id)}</div>
+  <div>Anak : ${getChildren(nodes, node.id)}</div>
   ${node.notes ? `<div>Catatan : ${node.notes}</div>` : ''}
   </div>`
 }
 
-const getChildren = (familyTree: FamilyNode[], parentId: string) => {
-  return familyTree.filter(node => node.parentId === parentId).map(child => child.name).join(', ');
+const getChildren = (nodes: FamilyNode[], parentId: string) => {
+  const children = nodes.filter(node => node.parentId === parentId).map(child => child.name);
+  if (children.length > 0) {
+    return children.join(', ');
+  }
+  return '-';
 }
 
-export default function FamilyTree({ familyTree }: Props) {
+export default function FamilyTree({ setLastSync, nodes, clickNodeAction, familyId }: Props) {
   const d3Container = useRef(null);
-  const [editMember, setEditMember] = useState<{ state: boolean; node: FamilyNode | null }>({
-    state: false,
-    node: null
-  });
   const chart = useMemo(() => new OrgChart<FamilyNode>(), []);
-
-  const openEditMemberModal = (state: boolean, node: FamilyNode | null) => {
-    setEditMember({
-      state,
-      node
+  const { toast } = useToast();
+  const isInitialRender = useRef(true);
+  const { mutate } = useSWR('/api/update', () => {
+    console.log(nodes)
+    fetch('/api/update', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id: familyId,
+        payload: nodes
+      }),
+    }).then(async (res) => {
+      if (res.status !== 200) {
+        const body = await res.json()
+        toast({
+          title: 'Ups... Penyimpanan gagal',
+          description: body.message,
+        })
+      } else {
+        const lastSyncDate = new Date()
+        toast({
+          title: `Tersimpan: ${lastSyncDate.toLocaleTimeString()}`,
+          duration: 1000
+        })
+      }
     })
-  }
+  }, { revalidateOnFocus: false, revalidateOnMount: false })
+
+  useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+    } else {
+      if (familyId !== null) {
+        setLastSync(new Date())
+        mutate()
+      }
+    }
+  }, [nodes, familyId])
 
   useLayoutEffect(() => {
+    let initialZoom = 1;
+    if (window.innerWidth < 500) {
+      initialZoom = 0.6;
+    }
+
     if (d3Container.current) {
       chart
         .container(d3Container.current)
-        .data(familyTree)
+        .data(nodes)
         .svgHeight(window.innerHeight)
         .linkYOffset(0)
+        .rootMargin(100)
         .setActiveNodeCentered(true)
         .buttonContent(({ node, state }) => {
           return `<div class="w-auto m-auto px-2 py-1 text-sm shadow text-gray-700 bg-white rounded border border-gray-300">${node.children
@@ -49,20 +92,20 @@ export default function FamilyTree({ familyTree }: Props) {
             : `Buka`
             }</div>`
         })
+        .initialZoom(initialZoom)
         .onNodeClick((node) => {
-          openEditMemberModal(true, node.data)
+          clickNodeAction(node.data)
         })
         .nodeContent((node) => {
-          return NodeElement(familyTree, node.data)
+          return NodeElement(nodes, node.data)
         })
         .render();
     }
-  }, [chart, familyTree]);
+  }, [chart, nodes]);
 
   return (
     <div className={'h-full'}>
       <div ref={d3Container} className={"h-full"} />
-      <EditMember open={editMember.state} data={editMember.node} setOpen={() => openEditMemberModal(false, null)} />
     </div>
   );
 };

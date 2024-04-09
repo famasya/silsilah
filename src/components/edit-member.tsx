@@ -13,7 +13,7 @@ export function EditMember({ open, setOpen, data }: Props) {
   return <Dialog open={open} onOpenChange={setOpen}>
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Ubah data</DialogTitle>
+        <DialogTitle className="font-bold">UBAH DATA</DialogTitle>
       </DialogHeader>
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">
@@ -48,7 +48,8 @@ export function EditMember({ open, setOpen, data }: Props) {
         </div>
       </div>
       <DialogFooter>
-        <Button type="submit">Save changes</Button>
+        <Button type="submit">Simpan</Button>
+        <Button type="button" variant="destructive">Hapus</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
