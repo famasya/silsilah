@@ -34,7 +34,6 @@ export default function FamilyTree({ setLastSync, nodes, clickNodeAction, family
   const { toast } = useToast();
   const isInitialRender = useRef(true);
   const { mutate } = useSWR('/api/update', () => {
-    console.log(nodes)
     fetch('/api/update', {
       method: 'post',
       headers: {
@@ -51,12 +50,6 @@ export default function FamilyTree({ setLastSync, nodes, clickNodeAction, family
           title: 'Ups... Penyimpanan gagal',
           description: body.message,
         })
-      } else {
-        const lastSyncDate = new Date()
-        toast({
-          title: `Tersimpan: ${lastSyncDate.toLocaleTimeString()}`,
-          duration: 1000
-        })
       }
     })
   }, { revalidateOnFocus: false, revalidateOnMount: false })
@@ -67,7 +60,13 @@ export default function FamilyTree({ setLastSync, nodes, clickNodeAction, family
     } else {
       if (familyId !== null) {
         setLastSync(new Date())
-        mutate()
+        mutate().then(() => {
+          const lastSyncDate = new Date()
+          toast({
+            title: `Tersimpan: ${lastSyncDate.toLocaleTimeString()}`,
+            duration: 1000
+          })
+        })
       }
     }
   }, [nodes, familyId])
