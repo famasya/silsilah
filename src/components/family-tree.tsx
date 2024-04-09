@@ -1,18 +1,20 @@
 import { FamilyNode } from '@/types';
 import { OrgChart } from 'd3-org-chart';
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import useSWR from 'swr';
 import { useToast } from './ui/use-toast';
 
 type Props = {
   nodes: FamilyNode[],
+  nodesView?: 'expand' | 'collapse' | 'default',
   familyId: string | null,
+  chart: OrgChart<FamilyNode>,
   setLastSync: (lastSync: Date) => void,
   clickNodeAction: (node: FamilyNode) => void
 }
 
 const NodeElement = (nodes: FamilyNode[], node: FamilyNode) => {
-  return `<div class="border text-base h-full border-2 p-4 border-gray-200 rounded">
+  return `<div class="border bg-gray-100 text-base h-full border border-2 p-4 border-gray-200 rounded">
   <div class="text-lg font-bold">[${node.sex.toString()}] ${node.name}</div>
   ${node.spouse ? `<div>Pasangan : ${node.spouse}</div>` : ''}
   <div>Anak : ${getChildren(nodes, node.id)}</div>
@@ -28,9 +30,8 @@ const getChildren = (nodes: FamilyNode[], parentId: string) => {
   return '-';
 }
 
-export default function FamilyTree({ setLastSync, nodes, clickNodeAction, familyId }: Props) {
+export default function FamilyTree({ setLastSync, chart, nodesView = 'default', nodes, clickNodeAction, familyId }: Props) {
   const d3Container = useRef(null);
-  const chart = useMemo(() => new OrgChart<FamilyNode>(), []);
   const { toast } = useToast();
   const isInitialRender = useRef(true);
   const { mutate } = useSWR('/api/update', () => {
@@ -50,6 +51,12 @@ export default function FamilyTree({ setLastSync, nodes, clickNodeAction, family
           title: 'Ups... Penyimpanan gagal',
           description: body.message,
         })
+      } else {
+        const lastSyncDate = new Date()
+        toast({
+          title: `Tersimpan: ${lastSyncDate.toLocaleTimeString()}`,
+          duration: 1000
+        })
       }
     })
   }, { revalidateOnFocus: false, revalidateOnMount: false })
@@ -60,16 +67,10 @@ export default function FamilyTree({ setLastSync, nodes, clickNodeAction, family
     } else {
       if (familyId !== "") {
         setLastSync(new Date())
-        mutate().then(() => {
-          const lastSyncDate = new Date()
-          toast({
-            title: `Tersimpan: ${lastSyncDate.toLocaleTimeString()}`,
-            duration: 1000
-          })
-        })
+        mutate()
       }
     }
-  }, [nodes, familyId, mutate, setLastSync, toast])
+  }, [nodes, familyId, mutate])
 
   useLayoutEffect(() => {
     let initialZoom = 1;
@@ -78,9 +79,15 @@ export default function FamilyTree({ setLastSync, nodes, clickNodeAction, family
     }
 
     if (d3Container.current) {
+      if (nodesView === 'collapse') {
+        chart.collapseAll()
+      } else if (nodesView === 'expand') {
+        chart.expandAll()
+      }
       chart
         .container(d3Container.current)
         .data(nodes)
+        .compact(true)
         .svgHeight(window.innerHeight)
         .linkYOffset(0)
         .rootMargin(100)
@@ -100,7 +107,7 @@ export default function FamilyTree({ setLastSync, nodes, clickNodeAction, family
         })
         .render();
     }
-  }, [chart, nodes, clickNodeAction]);
+  }, [chart, nodes, clickNodeAction, nodesView]);
 
   return (
     <div className={'h-full'}>

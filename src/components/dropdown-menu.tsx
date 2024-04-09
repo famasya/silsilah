@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FamilyNode } from "@/types";
-import { GithubIcon, MenuIcon, SaveIcon } from "lucide-react";
+import { ExpandIcon, GithubIcon, HardDriveDownloadIcon, MenuIcon, SaveIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
@@ -25,13 +25,15 @@ type Props = {
   nodes: FamilyNode[],
   setFamily: ({ id, title }: { id: string, title: string }) => void,
   lastSync: Date,
+  exportAction: () => void,
+  toggleNodesView: () => void
   family: {
     id: string
     title: string
   }
 }
 
-export default function Menu({ nodes, setFamily, family, lastSync }: Props) {
+export default function Menu({ nodes, toggleNodesView, exportAction, setFamily, family, lastSync }: Props) {
   const { toast } = useToast()
   const router = useRouter()
   const [familyName, setFamilyName] = useState('')
@@ -53,15 +55,15 @@ export default function Menu({ nodes, setFamily, family, lastSync }: Props) {
         description: body.message,
       })
     } else {
-      toast({
-        title: 'Berhasil!',
-        description: <>Silsilah <strong>{familyName}</strong> telah disimpan</>
-      })
       const body = await res.json()
       router.push(`/?fid=${body.id}`)
       setFamily({
         id: body.id,
         title: familyName
+      })
+      toast({
+        title: 'Berhasil!',
+        description: <>Silsilah <strong>{familyName}</strong> telah disimpan</>
       })
       openSaveModal(false)
     }
@@ -77,8 +79,9 @@ export default function Menu({ nodes, setFamily, family, lastSync }: Props) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         <DropdownMenuLabel>Menu</DropdownMenuLabel>
-        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => openSaveModal(true)} disabled={family.id !== ''}><SaveIcon size={16} className="mr-2" /> {family.id ? 'Tersimpan otomatis' : 'Simpan silsilah'} </DropdownMenuItem>
+        <DropdownMenuItem onClick={toggleNodesView} disabled={nodes.length === 0}><ExpandIcon size={16} className="mr-2" /> Buka / tutup semua</DropdownMenuItem>
+        <DropdownMenuItem onClick={exportAction} disabled={nodes.length === 0}><HardDriveDownloadIcon size={16} className="mr-2" /> Simpan gambar (PNG)</DropdownMenuItem>
         <DropdownMenuItem onClick={() => window.open("https://github.com/famasya/silsilah", "_blank")}><GithubIcon size={16} className="mr-2" /> Repository</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-xs flex flex-col items-start gap-2">

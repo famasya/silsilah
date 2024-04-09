@@ -27,6 +27,18 @@ const ParentSelector = ({ nodes, onSelect, defaultValue }: { nodes: FamilyNode[]
   </Select>
 }
 
+const removeParentAndChildren = (nodes: FamilyNode[], id: string): FamilyNode[] => {
+  return nodes.filter(node => {
+    if (node.id === id) {
+      return false;
+    }
+    if (node.parentId === id) {
+      return removeParentAndChildren(nodes, node.id).length === 0;
+    }
+    return true;
+  })
+}
+
 
 export default function Editor({ editingNode, nodes, setNodes, openEditor, setOpenEditor
 }: Props) {
@@ -137,7 +149,7 @@ export default function Editor({ editingNode, nodes, setNodes, openEditor, setOp
         }}>Simpan</Button>
         {editingNode !== null ? <Button variant={"destructive"}
           onClick={() => {
-            setNodes(nodes.filter(existingNode => existingNode.id !== editingNode.id))
+            setNodes(removeParentAndChildren(nodes, editingNode.id))
             setOpenEditor(false)
           }}
         >Hapus</Button> : null}

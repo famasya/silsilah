@@ -9,6 +9,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans", });
 
 export const metadata: Metadata = {
   title: "Silsilah Keluarga",
+  // I'm sorry a11y, but it breaks zoom on mobile :(
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
   description: "Buat silsilah keluargamu disini. Gratis!",
 };
 
