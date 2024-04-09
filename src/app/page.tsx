@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 
 const Renderer = dynamic(() => import('@/components/renderer'), { ssr: false });
 
+export const fetchCache = 'force-no-store';
 async function loadData(fid: string | undefined) {
   try {
     const { rows } = await sql`SELECT * FROM family_tree WHERE id = ${fid}`;
