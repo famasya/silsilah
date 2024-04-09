@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { FamilyNode } from "@/types";
 import { GithubIcon, HelpCircle, MenuIcon, SaveIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
 import { Button } from "./ui/button";
@@ -32,6 +33,7 @@ type Props = {
 
 export default function Menu({ nodes, setFamily, family, lastSync }: Props) {
   const { toast } = useToast()
+  const router = useRouter()
   const [familyName, setFamilyName] = useState('')
   const [saveModal, openSaveModal] = useState(false);
   const { isLoading, mutate } = useSWR('/api/create', () => fetch('api/create', {
@@ -56,6 +58,7 @@ export default function Menu({ nodes, setFamily, family, lastSync }: Props) {
         description: <>Silsilah <strong>{familyName}</strong> telah disimpan</>
       })
       const body = await res.json()
+      router.push(`/?fid=${body.id}`)
       setFamily({
         id: body.id,
         title: familyName

@@ -58,7 +58,7 @@ export default function FamilyTree({ setLastSync, nodes, clickNodeAction, family
     if (isInitialRender.current) {
       isInitialRender.current = false;
     } else {
-      if (familyId !== null) {
+      if (familyId !== "") {
         setLastSync(new Date())
         mutate().then(() => {
           const lastSyncDate = new Date()
@@ -69,7 +69,7 @@ export default function FamilyTree({ setLastSync, nodes, clickNodeAction, family
         })
       }
     }
-  }, [nodes, familyId])
+  }, [nodes, familyId, mutate, setLastSync, toast])
 
   useLayoutEffect(() => {
     let initialZoom = 1;
@@ -100,7 +100,7 @@ export default function FamilyTree({ setLastSync, nodes, clickNodeAction, family
         })
         .render();
     }
-  }, [chart, nodes]);
+  }, [chart, nodes, clickNodeAction]);
 
   return (
     <div className={'h-full'}>
