@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { FamilyNode } from "@/types";
 import { OrgChart } from "d3-org-chart";
-import { ExpandIcon, FileIcon, FullscreenIcon, GithubIcon, HardDriveDownloadIcon, MenuIcon, SaveIcon } from "lucide-react";
+import { CloudDownloadIcon, ExpandIcon, FileIcon, FullscreenIcon, GithubIcon, HardDriveUpload, HelpCircleIcon, MenuIcon, SaveIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -25,6 +25,7 @@ import { Input } from "./ui/input";
 type Props = {
   nodes: FamilyNode[],
   setFamily: ({ id, title }: { id: string, title: string }) => void,
+  loadLocalStorage: () => void,
   lastSync: Date,
   chart: OrgChart<FamilyNode>,
   toggleNodesView: () => void
@@ -34,10 +35,11 @@ type Props = {
   }
 }
 
-export default function Menu({ nodes, toggleNodesView, chart, setFamily, family, lastSync }: Props) {
+export default function Menu({ nodes, toggleNodesView, chart, loadLocalStorage, setFamily, family, lastSync }: Props) {
   const router = useRouter()
   const [familyName, setFamilyName] = useState("")
   const [saveModal, openSaveModal] = useState(false);
+  const [openHelp, openHelpModal] = useState(false);
   const { isLoading, mutate } = useSWR("/api/create", () => fetch("api/create", {
     method: "post",
     headers: {
@@ -77,7 +79,8 @@ export default function Menu({ nodes, toggleNodesView, chart, setFamily, family,
         <DropdownMenuLabel>Berkas</DropdownMenuLabel>
         <DropdownMenuItem onClick={() => location.href = "/"} ><FileIcon size={16} className="mr-2" /> Silsilah baru</DropdownMenuItem>
         <DropdownMenuItem onClick={() => openSaveModal(true)} disabled={family.id !== ""}><SaveIcon size={16} className="mr-2" /> {family.id ? "Tersimpan otomatis" : "Simpan silsilah"} </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => chart.exportImg({ backgroundColor: "#f5f5f5" })} disabled={nodes.length === 0}><HardDriveDownloadIcon size={16} className="mr-2" /> Simpan gambar (PNG)</DropdownMenuItem>
+        <DropdownMenuItem onClick={loadLocalStorage} disabled={nodes.length === 0}><HardDriveUpload size={16} className="mr-2" /> Ambil dari lokal </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => chart.exportImg({ backgroundColor: "#f5f5f5" })} disabled={nodes.length === 0}><CloudDownloadIcon size={16} className="mr-2" /> Simpan gambar (PNG)</DropdownMenuItem>
 
         {/* CONTROL */}
         <DropdownMenuSeparator />
@@ -87,12 +90,11 @@ export default function Menu({ nodes, toggleNodesView, chart, setFamily, family,
 
         {/* OTHERS */}
         <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => openHelpModal(true)}><HelpCircleIcon size={16} className="mr-2" /> Bantuan</DropdownMenuItem>
         <DropdownMenuItem onClick={() => window.open("https://github.com/famasya/silsilah", "_blank")}><GithubIcon size={16} className="mr-2" /> Kode sumber</DropdownMenuItem>
         <DropdownMenuItem className="text-xs flex flex-col items-start gap-2">
           <span>ID : <strong>{family.id ? family.id.split("-")[0] : "-"}</strong></span>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-xs">Dibuat pada hari Selasa, 29 Ramadhan 1445 H</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
 
@@ -117,5 +119,21 @@ export default function Menu({ nodes, toggleNodesView, chart, setFamily, family,
         </form>
       </DialogContent>
     </Dialog>
+
+    <Dialog open={openHelp} onOpenChange={openHelpModal}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Bantuan</DialogTitle>
+        </DialogHeader>
+        <div>
+          <p>1. Kami tidak menyimpan data pribadi Anda.</p>
+          <p>2. Gunakan menu <strong>Ambil dari Lokal</strong> jika ada silsilah yang belum tersimpan di <em>cloud</em>.</p>
+          <p className="text-xs mt-4">
+            Dibuat pada hari Selasa, 29 Ramadhan 1445 H.
+          </p>
+        </div>
+      </DialogContent>
+    </Dialog>
+
   </>
 }

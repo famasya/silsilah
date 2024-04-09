@@ -32,7 +32,8 @@
     "sonner": "^1.4.41",
     "swr": "^2.2.5",
     "tailwind-merge": "^2.2.2",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "use-local-storage": "^3.0.0"
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",

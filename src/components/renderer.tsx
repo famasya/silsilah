@@ -4,6 +4,7 @@ import { FamilyNode } from "@/types";
 import { OrgChart } from "d3-org-chart";
 import { PlusIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import useLocalStorage from "use-local-storage";
 import Menu from "./dropdown-menu";
 import Editor from "./editor";
 import FamilyTree from "./family-tree";
@@ -28,11 +29,16 @@ export default function Renderer({ nodes, title, id, updatedAt }: Props) {
   const [openEditor, setOpenEditor] = useState(false)
   const [nodesView, setNodesView] = useState<"expand" | "collapse" | "default">("default")
   const [lastSync, setLastSync] = useState<Date>(updatedAt ?? new Date())
+  const [localStorage, setLocalStorage] = useLocalStorage<FamilyNode[]>("nodes", []);
   const [family, setFamily] = useState<{ id: string; title: string }>({
     id: id,
     title: title
   });
   const chart = useRef(new OrgChart<FamilyNode>());
+
+  const loadLocalStorage = () => {
+    setData(localStorage)
+  }
 
   useEffect(() => {
     if (!openEditor) {
@@ -52,11 +58,19 @@ export default function Renderer({ nodes, title, id, updatedAt }: Props) {
           <span className="text-xs mt-2 bg-gray-100 p-1 rounded font-bold text-gray-500">Sinkronisasi: {family.id ? lastSync.toLocaleString() : "Belum disimpan"}</span>
         </span>
         <span className="flex-none">
-          <Menu chart={chart.current} toggleNodesView={() => setNodesView(nodesView === "expand" || nodesView === "default" ? "collapse" : "expand")} nodes={data} setFamily={setFamily} family={family} lastSync={lastSync} />
+          <Menu
+            loadLocalStorage={loadLocalStorage}
+            chart={chart.current}
+            toggleNodesView={() => setNodesView(nodesView === "expand" || nodesView === "default" ? "collapse" : "expand")}
+            nodes={data}
+            setFamily={setFamily}
+            family={family}
+            lastSync={lastSync} />
         </span>
       </div>
     </div>
     {data.length > 0 ? <FamilyTree
+      saveToLocalStorage={setLocalStorage}
       chart={chart.current}
       nodes={data}
       familyId={family.id}

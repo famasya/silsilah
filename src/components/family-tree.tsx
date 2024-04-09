@@ -9,6 +9,7 @@ type Props = {
   nodes: FamilyNode[],
   nodesView?: "expand" | "collapse" | "default",
   familyId: string | null,
+  saveToLocalStorage: (nodes: FamilyNode[]) => void,
   chart: OrgChart<FamilyNode>,
   setLastSync: (lastSync: Date) => void,
   clickNodeAction: (node: FamilyNode) => void
@@ -35,7 +36,7 @@ const getChildren = (nodes: FamilyNode[], parentId: string) => {
   return "-";
 }
 
-export default function FamilyTree({ setLastSync, chart, nodesView = "default", nodes, clickNodeAction, familyId }: Props) {
+export default function FamilyTree({ setLastSync, chart, saveToLocalStorage, nodesView = "default", nodes, clickNodeAction, familyId }: Props) {
   const d3Container = useRef(null);
   const isInitialRender = useRef(true);
   const { mutate } = useSWR("/api/update", () => {
@@ -62,11 +63,13 @@ export default function FamilyTree({ setLastSync, chart, nodesView = "default", 
     })
   }, { revalidateOnFocus: false, revalidateOnMount: false })
 
+  // auto save on every nodes change
   useEffect(() => {
     if (isInitialRender.current) {
       isInitialRender.current = false;
     } else {
       if (familyId !== "") {
+        saveToLocalStorage(nodes)
         setLastSync(new Date())
         mutate()
       }
