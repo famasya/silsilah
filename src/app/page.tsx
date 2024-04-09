@@ -1,10 +1,10 @@
-import { sql } from '@vercel/postgres';
-import { Metadata } from 'next';
-import dynamic from 'next/dynamic';
+import { sql } from "@vercel/postgres";
+import { Metadata } from "next";
+import dynamic from "next/dynamic";
 
-const Renderer = dynamic(() => import('@/components/renderer'), { ssr: false });
+const Renderer = dynamic(() => import("@/components/renderer"), { ssr: false });
 
-export const fetchCache = 'force-no-store';
+export const fetchCache = "force-no-store";
 async function loadData(fid: string | undefined) {
   try {
     if (fid === undefined) {
@@ -40,7 +40,7 @@ export async function generateMetadata(
   const { title, updatedAt } = await loadData(searchParams.fid)
   if (title === null) {
     return {
-      title: 'Silsilah Keluarga',
+      title: "Silsilah Keluarga",
       description: "Buat silsilah keluargamu disini. Gratis!",
     }
   }
@@ -53,5 +53,5 @@ export async function generateMetadata(
 
 export default async function Home({ searchParams }: { searchParams: any }) {
   const { id, nodes, updatedAt, title } = await loadData(searchParams.fid)
-  return <Renderer id={id ?? ''} title={title ?? ''} nodes={nodes ?? []} updatedAt={updatedAt} />
+  return <Renderer id={id ?? ""} title={title ?? ""} nodes={nodes ?? []} updatedAt={updatedAt} />
 }

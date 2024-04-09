@@ -13,10 +13,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FamilyNode } from "@/types";
-import { ExpandIcon, FileIcon, GithubIcon, HardDriveDownloadIcon, MenuIcon, SaveIcon } from "lucide-react";
+import { OrgChart } from "d3-org-chart";
+import { ExpandIcon, FileIcon, FullscreenIcon, GithubIcon, HardDriveDownloadIcon, MenuIcon, SaveIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from 'sonner';
+import { toast } from "sonner";
 import useSWR from "swr";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -25,7 +26,7 @@ type Props = {
   nodes: FamilyNode[],
   setFamily: ({ id, title }: { id: string, title: string }) => void,
   lastSync: Date,
-  exportAction: () => void,
+  chart: OrgChart<FamilyNode>,
   toggleNodesView: () => void
   family: {
     id: string
@@ -33,25 +34,26 @@ type Props = {
   }
 }
 
-export default function Menu({ nodes, toggleNodesView, exportAction, setFamily, family, lastSync }: Props) {
+export default function Menu({ nodes, toggleNodesView, chart, setFamily, family, lastSync }: Props) {
   const router = useRouter()
-  const [familyName, setFamilyName] = useState('')
+  const [familyName, setFamilyName] = useState("")
   const [saveModal, openSaveModal] = useState(false);
-  const { isLoading, mutate } = useSWR('/api/create', () => fetch('api/create', {
-    method: 'post',
+  const { isLoading, mutate } = useSWR("/api/create", () => fetch("api/create", {
+    method: "post",
     headers: {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
       name: familyName,
       payload: nodes
     }),
   }).then(async (res) => {
+    const body = await res.json()
     if (res.status !== 200) {
-      const body = await res.json()
-      toast.error('Penyimpanan gagal')
+      toast.error("Penyimpanan gagal", {
+        description: body.message
+      })
     } else {
-      const body = await res.json()
       router.push(`/?fid=${body.id}`)
       setFamily({
         id: body.id,
@@ -68,18 +70,26 @@ export default function Menu({ nodes, toggleNodesView, exportAction, setFamily, 
   return <>
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size={'icon'} className='shadow'><MenuIcon size={16} /></Button>
+        <Button size={"icon"} className="shadow"><MenuIcon size={16} /></Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align='end'>
-        <DropdownMenuLabel>Menu</DropdownMenuLabel>
-        <DropdownMenuItem onClick={() => location.href = '/'} ><FileIcon size={16} className="mr-2" /> Silsilah baru</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => openSaveModal(true)} disabled={family.id !== ''}><SaveIcon size={16} className="mr-2" /> {family.id ? 'Tersimpan otomatis' : 'Simpan silsilah'} </DropdownMenuItem>
-        <DropdownMenuItem onClick={toggleNodesView} disabled={nodes.length === 0}><ExpandIcon size={16} className="mr-2" /> Buka / tutup semua</DropdownMenuItem>
-        <DropdownMenuItem onClick={exportAction} disabled={nodes.length === 0}><HardDriveDownloadIcon size={16} className="mr-2" /> Simpan gambar (PNG)</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => window.open("https://github.com/famasya/silsilah", "_blank")}><GithubIcon size={16} className="mr-2" /> Repository</DropdownMenuItem>
+      <DropdownMenuContent align="end">
+        {/* FILE */}
+        <DropdownMenuLabel>Berkas</DropdownMenuLabel>
+        <DropdownMenuItem onClick={() => location.href = "/"} ><FileIcon size={16} className="mr-2" /> Silsilah baru</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => openSaveModal(true)} disabled={family.id !== ""}><SaveIcon size={16} className="mr-2" /> {family.id ? "Tersimpan otomatis" : "Simpan silsilah"} </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => chart.exportImg({ backgroundColor: "#f5f5f5" })} disabled={nodes.length === 0}><HardDriveDownloadIcon size={16} className="mr-2" /> Simpan gambar (PNG)</DropdownMenuItem>
+
+        {/* CONTROL */}
         <DropdownMenuSeparator />
+        <DropdownMenuLabel>Kontrol</DropdownMenuLabel>
+        <DropdownMenuItem onClick={toggleNodesView} disabled={nodes.length === 0}><ExpandIcon size={16} className="mr-2" /> Buka / tutup semua</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => chart.fit()} disabled={nodes.length === 0}><FullscreenIcon size={16} className="mr-2" /> Sesuikan dengan layar</DropdownMenuItem>
+
+        {/* OTHERS */}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => window.open("https://github.com/famasya/silsilah", "_blank")}><GithubIcon size={16} className="mr-2" /> Kode sumber</DropdownMenuItem>
         <DropdownMenuItem className="text-xs flex flex-col items-start gap-2">
-          <span>ID : <strong>{family.id ? family.id.split('-')[0] : '-'}</strong></span>
+          <span>ID : <strong>{family.id ? family.id.split("-")[0] : "-"}</strong></span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-xs">Dibuat pada hari Selasa, 29 Ramadhan 1445 H</DropdownMenuItem>

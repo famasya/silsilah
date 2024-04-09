@@ -1,12 +1,13 @@
-import { FamilyNode } from '@/types';
-import { OrgChart } from 'd3-org-chart';
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { FamilyNode } from "@/types";
+import { OrgChart } from "d3-org-chart";
+import { useEffect, useLayoutEffect, useRef } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { toast } from "sonner";
-import useSWR from 'swr';
+import useSWR from "swr";
 
 type Props = {
   nodes: FamilyNode[],
-  nodesView?: 'expand' | 'collapse' | 'default',
+  nodesView?: "expand" | "collapse" | "default",
   familyId: string | null,
   chart: OrgChart<FamilyNode>,
   setLastSync: (lastSync: Date) => void,
@@ -14,30 +15,34 @@ type Props = {
 }
 
 const NodeElement = (nodes: FamilyNode[], node: FamilyNode) => {
-  return `<div class="border bg-gray-100 text-base h-full border border-2 p-4 border-gray-200 rounded">
-  <div class="text-lg font-bold">[${node.sex.toString()}] ${node.name}</div>
-  ${node.spouse ? `<div>Pasangan : ${node.spouse}</div>` : ''}
-  <div>Anak : ${getChildren(nodes, node.id)}</div>
-  ${node.notes ? `<div>Catatan : ${node.notes}</div>` : ''}
-  </div>`
+  return renderToStaticMarkup(
+    <div className="border bg-gray-100 text-base h-full border border-2 p-4 border-gray-200 rounded">
+      <div className="text-lg font-bold">
+        [{node.sex.toString()}] {node.name}
+      </div>
+      {node.spouse ? `<div>Pasangan : ${node.spouse}</div>` : ""}
+      <div>Anak : {getChildren(nodes, node.id)}</div>
+      {node.notes ? `<div>Catatan : ${node.notes}</div>` : ""}
+    </div>
+  )
 }
 
 const getChildren = (nodes: FamilyNode[], parentId: string) => {
   const children = nodes.filter(node => node.parentId === parentId).map(child => child.name);
   if (children.length > 0) {
-    return children.join(', ');
+    return children.join(", ");
   }
-  return '-';
+  return "-";
 }
 
-export default function FamilyTree({ setLastSync, chart, nodesView = 'default', nodes, clickNodeAction, familyId }: Props) {
+export default function FamilyTree({ setLastSync, chart, nodesView = "default", nodes, clickNodeAction, familyId }: Props) {
   const d3Container = useRef(null);
   const isInitialRender = useRef(true);
-  const { mutate } = useSWR('/api/update', () => {
-    fetch('/api/update', {
-      method: 'post',
+  const { mutate } = useSWR("/api/update", () => {
+    fetch("/api/update", {
+      method: "post",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         id: familyId,
@@ -46,11 +51,11 @@ export default function FamilyTree({ setLastSync, chart, nodesView = 'default', 
     }).then(async (res: any) => {
       if (res.status !== 200) {
         const body = await res.json()
-        toast.error(`Penyimpanan gagal`, {
+        toast.error("Penyimpanan gagal", {
           description: body.message
         })
       } else {
-        toast.info('Tersimpan', {
+        toast.info("Tersimpan", {
           duration: 1000
         })
       }
@@ -66,7 +71,7 @@ export default function FamilyTree({ setLastSync, chart, nodesView = 'default', 
         mutate()
       }
     }
-  }, [nodes, familyId, mutate])
+  }, [nodes, familyId, setLastSync, mutate])
 
   useLayoutEffect(() => {
     let initialZoom = 1;
@@ -74,10 +79,10 @@ export default function FamilyTree({ setLastSync, chart, nodesView = 'default', 
       initialZoom = 0.6;
     }
 
-    if (d3Container.current) {
-      if (nodesView === 'collapse') {
+    if (d3Container.current && nodes.length > 0) {
+      if (nodesView === "collapse") {
         chart.collapseAll()
-      } else if (nodesView === 'expand') {
+      } else if (nodesView === "expand") {
         chart.expandAll()
       }
       chart
@@ -89,10 +94,12 @@ export default function FamilyTree({ setLastSync, chart, nodesView = 'default', 
         .rootMargin(100)
         .setActiveNodeCentered(true)
         .buttonContent(({ node, state }) => {
-          return `<div class="w-auto m-auto px-2 py-1 text-sm shadow text-gray-700 bg-white rounded border border-gray-300">${node.children
-            ? `Tutup`
-            : `Buka`
-            }</div>`
+          return renderToStaticMarkup(
+            <div className="w-auto m-auto px-2 py-1 text-sm shadow text-gray-700 bg-white rounded border border-gray-300">{node.children
+              ? "Tutup"
+              : "Buka"
+            }</div>
+          )
         })
         .initialZoom(initialZoom)
         .onNodeClick((node) => {
@@ -106,7 +113,7 @@ export default function FamilyTree({ setLastSync, chart, nodesView = 'default', 
   }, [chart, nodes, clickNodeAction, nodesView]);
 
   return (
-    <div className={'h-full'}>
+    <div className={"h-full"}>
       <div ref={d3Container} className={"h-full"} />
     </div>
   );

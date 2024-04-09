@@ -1,4 +1,4 @@
-'use server'
+"use server"
 
 import { sql } from "@vercel/postgres";
 import { NextRequest, NextResponse } from "next/server";
@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   if (name === null) {
     return NextResponse.json({
       success: false,
-      message: 'Invalid form data'
+      message: "Invalid form data"
     }, { status: 400 })
   }
 

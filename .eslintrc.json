@@ -1,3 +1,13 @@
 {
-  "extends": "next/core-web-vitals"
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "quotes": [
+      2,
+      "double",
+      {
+        "avoidEscape": true
+      }
+    ]
+  }
 }

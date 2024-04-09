@@ -1,5 +1,5 @@
 import { FamilyNode } from "@/types"
-import { v4 as uuid } from '@lukeed/uuid'
+import { v4 as uuid } from "@lukeed/uuid"
 import { useEffect, useState } from "react"
 import { Button } from "./ui/button"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog"
@@ -44,9 +44,9 @@ export default function Editor({ editingNode, nodes, setNodes, openEditor, setOp
 }: Props) {
 
   const defaultNodeValue: FamilyNode = {
-    name: '',
-    id: '',
-    sex: 'P',
+    name: "",
+    id: "",
+    sex: "P",
   }
   const [node, setNode] = useState<FamilyNode>(defaultNodeValue)
 
@@ -63,7 +63,7 @@ export default function Editor({ editingNode, nodes, setNodes, openEditor, setOp
     }
   }, [editingNode])
 
-  const setNodeValue = (key: 'name' | 'sex' | 'spouse' | 'notes' | 'parentId', value: string) => {
+  const setNodeValue = (key: "name" | "sex" | "spouse" | "notes" | "parentId", value: string) => {
     setNode({ ...node, [key]: value })
   }
 
@@ -73,7 +73,7 @@ export default function Editor({ editingNode, nodes, setNodes, openEditor, setOp
   }}>
     <DialogContent>
       <DialogHeader>
-        <DialogTitle className="font-bold">{editingNode ? 'Ubah Data' : 'Tambah Data'}</DialogTitle>
+        <DialogTitle className="font-bold">{editingNode ? "Ubah Data" : "Tambah Data"}</DialogTitle>
       </DialogHeader>
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">
@@ -81,7 +81,7 @@ export default function Editor({ editingNode, nodes, setNodes, openEditor, setOp
             Nama
           </Label>
           <Input
-            onChange={(e) => setNodeValue('name', e.currentTarget.value)}
+            onChange={(e) => setNodeValue("name", e.currentTarget.value)}
             id="name"
             defaultValue={editingNode?.name}
             className="col-span-3"
@@ -92,7 +92,7 @@ export default function Editor({ editingNode, nodes, setNodes, openEditor, setOp
             Jenis Kelamin
           </Label>
           <RadioGroup
-            id="sex" orientation="horizontal" name="sex" required className="flex flex-row" defaultValue={editingNode?.sex ?? "P"} onValueChange={(e) => setNodeValue('sex', e)}>
+            id="sex" orientation="horizontal" name="sex" required className="flex flex-row" defaultValue={editingNode?.sex ?? "P"} onValueChange={(e) => setNodeValue("sex", e)}>
             <div className="flex items-center space-x-2">
               <RadioGroupItem
                 value="P" id="p" />
@@ -109,7 +109,7 @@ export default function Editor({ editingNode, nodes, setNodes, openEditor, setOp
           <Label htmlFor="parent" className="text-right">
             Orangtua
           </Label>
-          <ParentSelector nodes={nodes} defaultValue={editingNode?.parentId} onSelect={(value) => setNodeValue('parentId', value)} />
+          <ParentSelector nodes={nodes} defaultValue={editingNode?.parentId} onSelect={(value) => setNodeValue("parentId", value)} />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="spouse" className="text-right">
@@ -118,7 +118,7 @@ export default function Editor({ editingNode, nodes, setNodes, openEditor, setOp
           <Input
             defaultValue={editingNode?.spouse}
             id="spouse"
-            onChange={(e) => setNodeValue('spouse', e.currentTarget.value)}
+            onChange={(e) => setNodeValue("spouse", e.currentTarget.value)}
             placeholder="Opsional"
             className="col-span-3"
           />
@@ -130,14 +130,14 @@ export default function Editor({ editingNode, nodes, setNodes, openEditor, setOp
           <Input
             id="notes"
             defaultValue={editingNode?.notes}
-            onChange={(e) => setNodeValue('notes', e.currentTarget.value)}
+            onChange={(e) => setNodeValue("notes", e.currentTarget.value)}
             placeholder="Opsional"
             className="col-span-3"
           />
         </div>
       </div>
       <DialogFooter>
-        <Button disabled={!editingNode && (node.name === '' || (node.parentId === undefined && nodes.length > 0))} onClick={() => {
+        <Button disabled={!editingNode && (node.name === "" || (node.parentId === undefined && nodes.length > 0))} onClick={() => {
           if (editingNode !== null) {
             const editedNodes = nodes.map(existingNode => {
               if (existingNode.id === editingNode.id) {
