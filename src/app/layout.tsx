@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -9,10 +9,15 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans", });
 
 export const metadata: Metadata = {
   title: "Silsilah Keluarga",
-  // I'm sorry a11y, but it breaks zoom on mobile :(
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
   description: "Buat silsilah keluargamu disini. Gratis!",
 };
+
+// I'm sorry a11y, but it breaks zoom on mobile :(
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+}
 
 export default function RootLayout({
   children,

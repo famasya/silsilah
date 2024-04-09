@@ -86,9 +86,6 @@ export default function Menu({ nodes, toggleNodesView, exportAction, setFamily, 
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-xs flex flex-col items-start gap-2">
           <span>ID : <strong>{family.id ? family.id.split('-')[0] : '-'}</strong></span>
-          <span>
-            Sinkronisasi: <strong>{lastSync.toLocaleString()}</strong>
-          </span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-xs">Dibuat pada hari Selasa, 29 Ramadhan 1445 H</DropdownMenuItem>

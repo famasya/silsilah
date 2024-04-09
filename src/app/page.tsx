@@ -7,6 +7,14 @@ const Renderer = dynamic(() => import('@/components/renderer'), { ssr: false });
 export const fetchCache = 'force-no-store';
 async function loadData(fid: string | undefined) {
   try {
+    if (fid === undefined) {
+      return {
+        id: null,
+        title: null,
+        updatedAt: null,
+        nodes: null
+      }
+    }
     const { rows } = await sql`SELECT * FROM family_tree WHERE id = ${fid}`;
     return {
       id: rows[0].id,

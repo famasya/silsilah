@@ -47,8 +47,9 @@ export default function Renderer({ nodes, title, id, updatedAt }: Props) {
           <Button size={'icon'} onClick={() => setOpenEditor(true)} className="shadow"><PlusIcon size={16} /></Button>
           <Editor setNodes={setData} nodes={data} editingNode={editingNode} openEditor={openEditor} setOpenEditor={setOpenEditor} />
         </span>
-        <span className='flex-1 flex justify-center items-center'>
-          <h1 className="lg:text-3xl md:text-xl font-semibold rounded p-4">{family.title !== '' ? family.title : 'Silsilah Keluarga'}</h1>
+        <span className='flex-1 flex flex-col justify-center items-center'>
+          <h1 className="lg:text-3xl md:text-xl font-semibold rounded">{family.title !== '' ? family.title : 'Silsilah Keluarga'}</h1>
+          <span className="text-xs mt-2 bg-gray-100 p-1 rounded font-bold text-gray-500">Sinkronisasi: {lastSync.toLocaleString()}</span>
         </span>
         <span className='flex-none'>
           <Menu exportAction={() => chart.exportImg()} toggleNodesView={() => setNodesView(nodesView === 'expand' || nodesView === 'default' ? 'collapse' : 'expand')} nodes={data} setFamily={setFamily} family={family} lastSync={lastSync} />

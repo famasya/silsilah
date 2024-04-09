@@ -43,11 +43,12 @@ const removeParentAndChildren = (nodes: FamilyNode[], id: string): FamilyNode[] 
 export default function Editor({ editingNode, nodes, setNodes, openEditor, setOpenEditor
 }: Props) {
 
-  const [node, setNode] = useState<FamilyNode>({
+  const defaultNodeValue: FamilyNode = {
     name: '',
     id: '',
     sex: 'P',
-  })
+  }
+  const [node, setNode] = useState<FamilyNode>(defaultNodeValue)
 
   useEffect(() => {
     if (editingNode) {
@@ -145,6 +146,7 @@ export default function Editor({ editingNode, nodes, setNodes, openEditor, setOp
           } else {
             setNodes([...nodes, { ...node, id: uuid() }])
           }
+          setNode(defaultNodeValue)
           setOpenEditor(false)
         }}>Simpan</Button>
         {editingNode !== null ? <Button variant={"destructive"}
