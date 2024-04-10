@@ -21,9 +21,9 @@ const NodeElement = (nodes: FamilyNode[], node: FamilyNode) => {
       <div className="text-lg font-bold">
         [{node.sex.toString()}] {node.name}
       </div>
-      {node.spouse ? `<div>Pasangan : ${node.spouse}</div>` : ""}
-      <div>Anak : {getChildren(nodes, node.id)}</div>
-      {node.notes ? `<div>Catatan : ${node.notes}</div>` : ""}
+      {node.spouse ? <div className="text-sm">Pasangan : {node.spouse}</div> : ""}
+      <div className="text-sm">Anak : {getChildren(nodes, node.id)}</div>
+      {node.notes ? <div className="text-sm">Catatan : {node.notes}</div> : ""}
     </div>
   )
 }
