@@ -76,7 +76,7 @@ export default function FamilyTree({ setLastSync, chart, saveToLocalStorage, nod
         mutate()
       }
     }
-  }, [nodes, familyId, setLastSync, mutate])
+  }, [nodes, familyId, setLastSync, mutate, loadLocal, saveToLocalStorage])
 
   useLayoutEffect(() => {
     let initialZoom = 1;

@@ -40,16 +40,15 @@ export default function Renderer({ nodes, title, id, updatedAt }: Props) {
 
   const openLocalVersion = () => {
     const url = new URL(window.location.href);
-    url.searchParams.set('local', 'true')
-    window.open(url.toString(), '_blank');
+    url.searchParams.set("local", "true")
+    window.open(url.toString(), "_blank");
   }
 
   useEffect(() => {
     if (loadLocal) {
-      console.log(123)
       setData(localStorage)
     }
-  }, [loadLocal])
+  }, [loadLocal, localStorage])
 
   useEffect(() => {
     if (!openEditor) {
