@@ -3,6 +3,7 @@
 import { FamilyNode } from "@/types";
 import { OrgChart } from "d3-org-chart";
 import { PlusIcon } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import useLocalStorage from "use-local-storage";
 import Menu from "./dropdown-menu";
@@ -35,10 +36,20 @@ export default function Renderer({ nodes, title, id, updatedAt }: Props) {
     title: title
   });
   const chart = useRef(new OrgChart<FamilyNode>());
+  const loadLocal = useSearchParams().get("local") === "true";
 
-  const loadLocalStorage = () => {
-    setData(localStorage)
+  const openLocalVersion = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('local', 'true')
+    window.open(url.toString(), '_blank');
   }
+
+  useEffect(() => {
+    if (loadLocal) {
+      console.log(123)
+      setData(localStorage)
+    }
+  }, [loadLocal])
 
   useEffect(() => {
     if (!openEditor) {
@@ -59,7 +70,7 @@ export default function Renderer({ nodes, title, id, updatedAt }: Props) {
         </span>
         <span className="flex-none">
           <Menu
-            loadLocalStorage={loadLocalStorage}
+            loadLocalStorage={openLocalVersion}
             chart={chart.current}
             toggleNodesView={() => setNodesView(nodesView === "expand" || nodesView === "default" ? "collapse" : "expand")}
             nodes={data}

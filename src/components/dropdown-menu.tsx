@@ -79,7 +79,7 @@ export default function Menu({ nodes, toggleNodesView, chart, loadLocalStorage, 
         <DropdownMenuLabel>Berkas</DropdownMenuLabel>
         <DropdownMenuItem onClick={() => location.href = "/"} ><FileIcon size={16} className="mr-2" /> Silsilah baru</DropdownMenuItem>
         <DropdownMenuItem onClick={() => openSaveModal(true)} disabled={family.id !== ""}><SaveIcon size={16} className="mr-2" /> {family.id ? "Tersimpan otomatis" : "Simpan silsilah"} </DropdownMenuItem>
-        <DropdownMenuItem onClick={loadLocalStorage} disabled={nodes.length === 0}><HardDriveUpload size={16} className="mr-2" /> Ambil dari lokal </DropdownMenuItem>
+        <DropdownMenuItem onClick={loadLocalStorage} disabled={nodes.length === 0}><HardDriveUpload size={16} className="mr-2" /> Lihat versi lokal </DropdownMenuItem>
         <DropdownMenuItem onClick={() => chart.exportImg({ backgroundColor: "#f5f5f5" })} disabled={nodes.length === 0}><CloudDownloadIcon size={16} className="mr-2" /> Simpan gambar (PNG)</DropdownMenuItem>
 
         {/* CONTROL */}
@@ -127,7 +127,7 @@ export default function Menu({ nodes, toggleNodesView, chart, loadLocalStorage, 
         </DialogHeader>
         <div>
           <p>1. Kami tidak menyimpan data pribadi Anda.</p>
-          <p>2. Gunakan menu <strong>Ambil dari Lokal</strong> jika ada silsilah yang belum tersimpan di <em>cloud</em>.</p>
+          <p>2. Gunakan menu <strong>Lihat dari Lokal</strong> untuk membandingkan dengan versi lokal peramban ini (misal: jika sinkronisasi <em>cloud</em> gagal).</p>
           <p className="text-xs mt-4">
             Dibuat pada hari Selasa, 29 Ramadhan 1445 H.
           </p>

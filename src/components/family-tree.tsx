@@ -1,5 +1,6 @@
 import { FamilyNode } from "@/types";
 import { OrgChart } from "d3-org-chart";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { toast } from "sonner";
@@ -39,6 +40,7 @@ const getChildren = (nodes: FamilyNode[], parentId: string) => {
 export default function FamilyTree({ setLastSync, chart, saveToLocalStorage, nodesView = "default", nodes, clickNodeAction, familyId }: Props) {
   const d3Container = useRef(null);
   const isInitialRender = useRef(true);
+  const loadLocal = useSearchParams().get("local") === "true";
   const { mutate } = useSWR("/api/update", () => {
     fetch("/api/update", {
       method: "post",
@@ -68,7 +70,7 @@ export default function FamilyTree({ setLastSync, chart, saveToLocalStorage, nod
     if (isInitialRender.current) {
       isInitialRender.current = false;
     } else {
-      if (familyId !== "") {
+      if (familyId !== "" && !loadLocal) {
         saveToLocalStorage(nodes)
         setLastSync(new Date())
         mutate()
